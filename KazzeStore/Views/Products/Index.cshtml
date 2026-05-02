@@ -1,0 +1,171 @@
+﻿@model IEnumerable<KazzeStore.Models.Product>
+@{
+    ViewData["Title"] = "Tienda - KazzeStore";
+}
+<div class="container mt-5"
+     style="padding-top:35px; padding-bottom:45px;">
+    <div class="text-center mb-1">
+        <h1 class="display-4 fw-bold" style="color:darkred;">
+            KAZZE STORE</h1> 
+    </div>
+    <p class="lead text-muted text-center mb-3">Anime •  火  Kanjis 天 • Minimalista</p>
+
+    <div class="mb-4">
+        <form asp-action="Search" method="get" class="d-flex">
+            <input type="text" name="term" class="form-control me-2" placeholder="Buscar polos..." value="@ViewBag.SearchTerm" />
+            <button type="submit" class="btn btn-primary me-2" style="background:darkred; border:0px">Buscar</button>
+            <a asp-action="Index" class="btn btn-secondary">Limpiar</a>
+        </form>
+    </div>
+
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col">
+
+                <div class="card h-100 shadow-sm border-0" style="padding:20px;">
+
+                    <a asp-action="Details" asp-route-id="@item.Id">
+                        <img src="@item.ImagenUrl" class="card-img-top" alt="@item.Nombre"
+                             style="height: 240px; object-fit: cover; margin-bottom:10px;" />
+                    </a>
+                    <div class=" d-flex flex-column">
+                        <h5 class="card-title">@item.Nombre</h5>
+                        <h4 class="text-success fw-bold" style="color:darkgreen">S/ @item.Precio</h4>
+
+                        <div class="mb-3">
+                            @if (item.Stock == 0)
+                            {
+                                <span class="text-danger fw-bold">Sin Stock</span>
+                            }
+                            else if (item.Stock >= 1)
+                            {
+                                <span class="text-success fw-bold" style="color:darkgreen">Disponible</span>
+                            }
+                            else
+                            {
+                                <small class="text-muted">Stock: @item.Stock unidades</small>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <div id="tallas-@item.Id">
+                                <small class="text-muted">Talla:</small>
+
+                            </div>
+                        </div>
+
+                        <button onclick="agregarAlCarrito(@item.Id)"
+                                class="btn btn-success w-100 mb-2"
+                                id="btnAgregar-@item.Id" disabled >
+                            🛒 Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+
+    <div class="d-flex justify-content-center mt-5">
+        <nav>
+            <ul class="pagination">
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    bool isActive = (i == ViewBag.CurrentPage);
+                    <li class="page-item @(isActive ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           style="color: @(isActive ? "white" : "darkred");
+                                  background-color: @(isActive ? "darkred" : "transparent");
+                                  border: none;
+                                  font-weight: bold;">
+                            @i
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</div>
+<script>
+    let tallasSeleccionadas = {};
+
+    function cargarTallas(productId, tallasStr, stock) {
+        const container = document.getElementById(`tallas-${productId}`);
+        const tallas = tallasStr.split(',').map(t => t.trim()).filter(t => t);
+
+    if (stock <= 0) {
+        container.innerHTML = '<small class="text-muted fw-bold d-block" style="margin-bottom: 13.5px;">Talla: No Disponible</small>';
+        return;
+    }
+
+
+
+        tallas.forEach(talla => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-outline-dark btn-sm me-1 mb-1';
+            btn.textContent = talla;
+            btn.onclick = () => {
+                document.querySelectorAll(`#tallas-${productId} button`).forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                tallasSeleccionadas[productId] = talla;
+                document.getElementById(`btnAgregar-${productId}`).disabled = false;
+            };
+            container.appendChild(btn);
+        });
+    }
+
+       function actualizarTarjetaProducto(productId) {
+        const tallasContainer = document.getElementById(`tallas-${productId}`);
+        if (tallasContainer) {
+            tallasContainer.innerHTML = '<small class="text-danger fw-bold">No Disponible</small>';
+        }
+        const btnAgregar = document.getElementById(`btnAgregar-${productId}`);
+        if (btnAgregar) {
+            btnAgregar.disabled = true;
+            btnAgregar.style.opacity = '0.1';
+            btnAgregar.style.cursor = 'not-allowed';
+            btnAgregar.textContent = 'Sin Stock';
+        }
+    }
+
+
+    function agregarAlCarrito(productId) {
+        const talla = tallasSeleccionadas[productId];
+        if (!talla) {
+            alert("Debes seleccionar una talla");
+            return;
+        }
+        fetch(`/Cart/AddToCart/${productId}?talla=${talla}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                updateCartCount();
+                showAddMessage();
+
+                tallasSeleccionadas[productId] = null;
+                document.querySelectorAll(`#tallas-${productId} button`).forEach(b => b.classList.remove('active'));
+                document.getElementById(`btnAgregar-${productId}`).disabled = true;
+
+                if (data.remainingStock <= 0) {
+                    location.reload();
+                }
+            });
+    }
+
+
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        @foreach (var item in Model)
+        {
+                    <text>
+                        cargarTallas(@item.Id, "@item.Talla", @item.Stock);
+                    </text>
+        }
+        updateCartCount();
+    });
+</script>

@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "¡Gracias por tu compra!";
+}
+
+<div class="container mt-5 text-center">
+    <div class="py-5">
+        <h1 class="display-4" style="color:darkred">¡Gracias por tu compra!</h1>
+        <p class="lead">Tu pedido ha sido procesado con éxito.</p>
+        <p>Te enviamos un correo con los detalles.</p>
+
+        <div class="mt-5">
+            <a asp-controller="Products" asp-action="Index" class="btn btn-primary btn-lg" style="background:darkred; border:0px">
+                Seguir Comprando
+            </a>
+
+            <a asp-controller="Orders"
+               asp-action="MyOrders"
+               class="btn btn-lg ms-3"
+               style="color: #4a4a4a; border: 2px solid #4a4a4a; background-color: transparent; opacity: 0.6; transition: all 0.3s ease;"
+               onmouseover="this.style.backgroundColor='#000000'; this.style.color='#ffffff'; this.style.borderColor='#000000'; this.style.opacity='1';"
+               onmouseout="this.style.backgroundColor='transparent'; this.style.color='#4a4a4a'; this.style.borderColor='#4a4a4a'; this.style.opacity='0.6';">
+                Ver Mis Compras
+            </a>
+
+        </div>
+    </div>
+</div>

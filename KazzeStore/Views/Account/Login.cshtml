@@ -1,0 +1,49 @@
+﻿@model KazzeStore.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Iniciar Sesión - KazzeStore";
+}
+
+<div class="container mt-5"
+    style="padding-top:40px">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header text-center py-4">
+                    <h2 class="mb-0">Iniciar Sesión</h2>
+                    <p class="mb-0 opacity-75">Bienvenido de nuevo a KazzeStore</p>
+                </div>
+                <div class="card-body p-4">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Login" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-semibold"></label>
+                            <input asp-for="Email" class="form-control" placeholder="tucorreo@email.com" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label fw-semibold"></label>
+                            <input asp-for="Password" class="form-control" type="password" placeholder="••••••••" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+
+                        <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">Iniciar Sesión</button>
+                    </form>
+                </div>
+                <div class="card-footer text-center bg-light py-3" style="display:flex ; justify-content:center">
+                    <p>¿No tienes cuenta? </p><a asp-action="Register" class="text-decoration-none" style="color:red">&nbspRegístrate aquí</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

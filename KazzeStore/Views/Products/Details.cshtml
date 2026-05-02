@@ -1,0 +1,103 @@
+﻿@model KazzeStore.Models.Product
+@{
+    ViewData["Title"] = Model.Nombre;
+}
+
+<div class="container mt-5" style="padding-top:45px;">
+    <div class="row">
+
+        <div class="col-md-6 mb-4">
+            <img src="@Model.ImagenUrl" alt="@Model.Nombre"
+                 class="img-fluid rounded shadow"
+                 style="max-height: 420px; object-fit: cover; width: 80%;" />
+        </div>
+
+
+        <div class="col-md-6">
+            <h1 class="display-5 fw-bold">@Model.Nombre</h1>
+
+            <p><strong>Categoría:</strong> @Model.Category?.Nombre</p>
+            <p><strong>Color:</strong> @Model.Color</p>
+            <p><strong>Talla:</strong> @Model.Talla</p>
+
+            <h2 class="text-success mb-4">S/ @Model.Precio</h2>
+
+            <p><strong>Descripción:</strong> @Model.Descripcion</p>
+
+            @if (Model.Stock <= 0)
+            {
+                <div class="alert alert-danger">
+                    <strong>Sin Stock</strong> - Este producto no está disponible actualmente.
+                </div>
+            }
+            else
+            {
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Seleccionar Talla</label>
+                    <div class="d-flex gap-2 flex-wrap" id="tallaButtons">
+
+                    </div>
+                </div>
+            }
+
+         
+            <div class="d-flex gap-3">
+                @if (Model.Stock > 0)
+                {
+                    <button id="btnAgregar" class="btn btn-success px-5" disabled>
+                        🛒 Agregar al Carrito
+                    </button>
+                }
+                <a asp-action="Index" class="btn btn-secondary  px-5">
+                    ← Volver a la Tienda
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let tallaSeleccionada = null;
+    const tallasDisponibles = "@Model.Talla".split(',').map(t => t.trim()).filter(t => t);
+    const container = document.getElementById('tallaButtons');
+    const btnAgregar = document.getElementById('btnAgregar');
+
+    if (btnAgregar) {
+        if (@Model.Stock <= 0) {
+            const mensaje = document.createElement('small');
+            mensaje.className = 'text-muted fw-bold d-block';
+            mensaje.style.marginBottom = '13.5px';
+            mensaje.textContent = 'Talla: No Disponible';
+            container.appendChild(mensaje);
+        } else {
+            tallasDisponibles.forEach(talla => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-outline-dark px-3';
+                btn.textContent = talla;
+                btn.onclick = () => {
+                    document.querySelectorAll('#tallaButtons button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    tallaSeleccionada = talla;
+                    btnAgregar.disabled = false;
+                };
+                container.appendChild(btn);
+            });
+
+            btnAgregar.onclick = () => {
+                if (!tallaSeleccionada) {
+                    alert("Debes seleccionar una talla");
+                    return;
+                }
+                fetch(`/Cart/AddToCart/@Model.Id?talla=${tallaSeleccionada}`, { method: 'POST' })
+                    .then(response => {
+                        if (response.ok) {
+                            updateCartCount();
+                            showAddMessage();
+                            location.reload();
+                        }
+                    });
+            };
+        }
+    }
+</script>

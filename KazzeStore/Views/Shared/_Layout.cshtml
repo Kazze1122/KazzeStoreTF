@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - KazzeStore</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/KazzeStore.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-light border-bottom box-shadow mb-0 fixed-top">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" style="color:darkred">火 KazzeStore</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Index">Tienda</a>
+                        </li>
+
+                        @if (User.Identity?.IsAuthenticated == true && User.Identity.Name != "admin@kazzestore.com")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Orders" asp-action="MyOrders">Mis Compras</a>
+                            </li>
+                        }
+
+
+                        
+
+
+                        @if (User.Identity?.IsAuthenticated == true && User.Identity.Name == "admin@kazzestore.com")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Admin" asp-action="Products">Inventario</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Orders" asp-action="AllOrders">Ventas</a>
+                            </li>
+                        }
+
+                        <li class="nav-item d-flex align-items-center">
+                            <a asp-controller="Cart" asp-action="Index" class="nav-link text-dark position-relative" title="Carrito" id="cartLink">
+                                🛒
+                                <span id="cartCount">
+                                    0
+                                </span>
+                            </a>
+                            <span id="addMessage" class="ms-2 text-success fw-bold" 
+                                      style="display:none; opacity:1; transition: opacity 0.6s ease-out;">
+                                    Añadido
+                                </span>
+                        </li>
+                    </ul>
+
+                    <ul class="navbar-nav">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-dark">
+                                    Hola,
+                                    <strong style="color: darkred;">@(User.FindFirst("NombreCompleto")?.Value ?? "Usuario")</strong>
+                                    (@User.Identity.Name)
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
+                                    <button type="submit"
+                                            class="nav-link btn btn-link text-dark border-0 bg-transparent p-0 d-flex align-items-center h-100">
+                                        Cerrar Sesión
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Iniciar Sesión</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Registrarse</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main" style="margin-top: 0 !important; padding-top: 0 !important;">
+        @RenderBody()
+    </main>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2026 - KazzeStore - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+
+
+         function showAddMessage() {
+            const message = document.getElementById('addMessage');
+            if (message) {
+                message.style.display = 'inline';
+                setTimeout(() => {
+                    message.style.display = 'none';
+                }, 1500);
+            }
+        }
+
+
+        function updateCartCount() {
+            fetch('/Cart/GetCount')
+                .then(response => response.json())
+                .then(count => {
+                    document.getElementById('cartCount').textContent = count;
+                })
+                .catch(() => {});
+        }
+
+        document.addEventListener('DOMContentLoaded', updateCartCount);
+    </script>
+</body>
+</html>

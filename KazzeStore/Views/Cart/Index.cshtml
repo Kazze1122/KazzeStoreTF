@@ -1,0 +1,71 @@
+﻿@model KazzeStore.Models.ShoppingCart
+@{
+    ViewData["Title"] = "Carrito de compras";
+}
+
+<div class="container mt-5"
+    style="padding:45px">
+    <h2>Carrito de compras</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-8">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Talla</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unit.</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>@item.Nombre</td>
+                            <td>@item.Talla</td>
+                            <td>@item.Cantidad</td>
+                            <td>S/ @item.Precio</td>
+                            <td>S/ @(item.Precio* item.Cantidad)</td>
+                            <td>
+                                <a asp-action="Remove" asp-route-id="@item.ProductId" class="btn btn-danger btn-sm">Eliminar</a>
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Resumen de Compra</h5>
+                    <hr>
+                    <h4>Total: <strong class="text-success">S/ @Model.Total</strong></h4>
+                    <button onclick="confirmarCompra()" class="btn btn-success w-100 mt-4">
+                        Confirmar Compra
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmarCompra() {
+        if (confirm("¿Confirmar la compra?")) {
+            fetch('/Cart/ConfirmPurchase', { method: 'POST' })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/Cart/ThankYou';
+                    }
+                });
+        }
+    }
+</script>
+
+
+

@@ -1,0 +1,58 @@
+﻿@model IEnumerable<KazzeStore.Models.Order>
+@{
+    ViewData["Title"] = "Todas las Compras - Admin";
+}
+
+<div class="container mt-5" style="padding-top:35px">
+    <h2 class="mb-4">📦 Todas las Ventas</h2>
+
+    <!-- Buscador -->
+    <div class="mb-4">
+        <form asp-action="SearchSales" method="get" class="d-flex">
+            <input type="text" name="userName" class="form-control me-2" placeholder="Buscar por nombre de cliente..." value="@ViewBag.SearchTerm" />
+            <button type="submit" class="btn btn-primary me-2" style="background:darkred; border:0px">Buscar</button>
+            <a asp-action="AllOrders" class="btn btn-secondary">Limpiar</a>
+        </form>
+    </div>
+
+    @if (Model.Any())
+    {
+        <table class="table table-hover align-middle small">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 8%">Venta #</th>
+                    <th style="width: 15%">Cliente</th>
+                    <th style="width: 22%">Correo</th>
+                    <th style="width: 12%">Fecha</th>
+                    <th style="width: 8%">Hora</th>
+                    <th style="width: 25%">Productos</th>
+                    <th style="width: 13%">Total</th>
+                    <th style="width: 7%">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">#@order.Id</td>
+                        <td>@order.UserName</td>
+                        <td class="text-muted">@order.UserId</td>
+                        <td>@order.Fecha.ToString("dd/MM/yyyy")</td>
+                        <td>@order.Fecha.ToString("HH:mm")</td>
+                        <td class="text-muted">@order.Detalles</td>
+                        <td class="fw-bold text-success">S/ @order.Total</td>
+                        <td>
+                            <span class="badge bg-success">Completado</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <h4 class="text-muted">No hay compras registradas</h4>
+        </div>
+    }
+</div>

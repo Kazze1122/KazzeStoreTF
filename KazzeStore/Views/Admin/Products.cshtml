@@ -1,0 +1,132 @@
+﻿@model IEnumerable<KazzeStore.Models.Product>
+@{
+    ViewData["Title"] = "Gestión de Productos - Admin";
+}
+<div class="container mt-4" style="padding-top:45px;">
+    <h2 class="mb-4">Gestión de Productos</h2>
+
+
+    <div class="d-flex justify-content-between align-items-end mb-4 gap-4">
+        <form method="get" class="d-flex gap-4 align-items-end">
+
+            <div class="d-flex flex-row align-items-center gap-2">
+                <label class="form-label fw-semibold small mb-0">Categoría</label>
+                <select name="category" class="form-select form-select-sm" style="width: 160px;">
+                    <option value="">Todas</option>
+                    <option value="1" selected="@(ViewBag.SelectedCategory == "1")">Anime</option>
+                    <option value="2" selected="@(ViewBag.SelectedCategory == "2")">Kanjis</option>
+                    <option value="3" selected="@(ViewBag.SelectedCategory == "3")">Minimalista</option>
+                </select>
+            </div>
+
+            <div class="d-flex flex-row align-items-center gap-2">
+                <label class="form-label fw-semibold small mb-0">Color</label>
+                <select name="color" class="form-select form-select-sm" style="width: 140px;">
+                    <option value="">Todos</option>
+                    <option value="blanco" selected="@(ViewBag.SelectedColor == "blanco")">Blanco</option>
+                    <option value="negro" selected="@(ViewBag.SelectedColor == "negro")">Negro</option>
+                    <option value="rojo" selected="@(ViewBag.SelectedColor == "rojo")">Rojo</option>
+                    <option value="gris" selected="@(ViewBag.SelectedColor == "gris")">Gris</option>
+                    <option value="verde oscuro" selected="@(ViewBag.SelectedColor == "verde oscuro")">Verde Oscuro</option>
+                    <option value="azul oscuro" selected="@(ViewBag.SelectedColor == "azul oscuro")">Azul Oscuro</option>
+                </select>
+            </div>
+
+
+            <div class="d-flex flex-row align-items-center gap-2">
+                <label class="form-label fw-semibold small mb-0">Stock</label>
+                <select name="stockStatus" class="form-select form-select-sm" style="width: 160px;">
+                    <option value="">Todos</option>
+                    <option value="Agotado" selected="@(ViewBag.SelectedStock == "Agotado")">Agotado (0)</option>
+                    <option value="Reponer" selected="@(ViewBag.SelectedStock == "Reponer")">Reponer (1-5)</option>
+                    <option value="Optimo" selected="@(ViewBag.SelectedStock == "Optimo")">Óptimo (6-30)</option>
+                    <option value="Excedente" selected="@(ViewBag.SelectedStock == "Excedente")">Excedente (30+)</option>
+                </select>
+            </div>
+
+
+            <div class="d-flex flex-row align-items-center gap-2">
+                <label class="form-label fw-semibold small mb-0">Talla</label>
+                <select name="talla" class="form-select form-select-sm" style="width: 100px;">
+                    <option value="">Todas</option>
+                    <option value="S" selected="@(ViewBag.SelectedTalla == "S")">S</option>
+                    <option value="M" selected="@(ViewBag.SelectedTalla == "M")">M</option>
+                    <option value="L" selected="@(ViewBag.SelectedTalla == "L")">L</option>
+                    <option value="XL" selected="@(ViewBag.SelectedTalla == "XL")">XL</option>
+                    <option value="XXL" selected="@(ViewBag.SelectedTalla == "XXL")">XXL</option>
+                </select>
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+            </div>
+        </form>
+
+        <a asp-action="Create" class="btn btn-success btn-sm">
+            + Nuevo Producto
+        </a>
+    </div>
+
+
+    <table class="table table-hover table-bordered align-middle text-center">
+        <thead class="table-dark">
+            <tr>
+                <th style="width: 80px;">Imagen</th>
+                <th>Nombre del Polo</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Talla</th>
+                <th>Color</th>
+                <th>Stock</th>
+                <th style="width: 200px;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <img src="@item.ImagenUrl" alt="@item.Nombre"
+                             class="img-thumbnail" style="width: 70px; height: 70px; object-fit: cover;" />
+                    </td>
+                    <td class="text-start">
+                        @item.Nombre<br>
+                        
+                    </td>
+                    <td>@(item.Category?.Nombre ?? "Sin categoría")</td>
+                    <td class="fw-bold text-success">S/ @item.Precio</td>
+                    <td>@item.Talla</td>
+                    <td>@item.Color</td>
+                    
+                    <td>
+                        @if (item.Stock == 0)
+                        {
+                            <span class="badge bg-danger fs-6">Sin Stock</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-@(item.Stock >= 30 ? "primary" : item.Stock >= 10 ? "success" : "warning") fs-6">
+                                @item.Stock Unidades
+                            </span>
+                        }
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a asp-action="Edit" asp-route-id="@item.Id"
+                               class="btn btn-warning btn-sm">Editar</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id"
+                               class="btn btn-danger btn-sm">Eliminar</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center py-4">
+            No hay productos registrados aún.
+        </div>
+    }
+</div>

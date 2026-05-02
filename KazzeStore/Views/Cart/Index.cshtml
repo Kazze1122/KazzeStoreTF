@@ -55,14 +55,26 @@
 </div>
 
 <script>
-    function confirmarCompra() {
-        if (confirm("¿Confirmar la compra?")) {
-            fetch('/Cart/ConfirmPurchase', { method: 'POST' })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.href = '/Cart/ThankYou';
+        function confirmarCompra() {
+        @if (User.Identity.IsAuthenticated)
+        {
+                <text>
+                    if (confirm("¿Confirmar la compra?")) {
+                        fetch('/Cart/ConfirmPurchase', { method: 'POST' })
+                            .then(response => {
+                                if (response.ok) {
+                                    window.location.href = '/Cart/ThankYou';
+                                }
+                            });
                     }
-                });
+                </text>
+        }
+        else
+        {
+                <text>
+                    alert("Debes iniciar sesión o registrarte para comprar.");
+                    window.location.href = '/Account/Register';
+                </text>
         }
     }
 </script>
